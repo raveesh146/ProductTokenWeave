@@ -1,49 +1,66 @@
-import { useState } from 'react';
-import { Package2, Shield, Loader2, Twitter, Hexagon, CheckCircle2, AlertCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { Package2, Twitter, Hexagon,} from 'lucide-react';
 import ProductForm from './ProductForm';
+import ProcessingComponent from '../components/ProcessingComponent';
 import NFTPreview from '../components/NFTPreview';
 
-export default function HomePage() {
+const HomePage: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
-  const [currentStep, setCurrentStep] = useState<'twitter' | 'zkproof' | 'tokenization'>('twitter');
   const [previewData, setPreviewData] = useState<null | {
     productName: string;
     description: string;
     companyName: string;
   }>(null);
-  const [transactionStatus, setTransactionStatus] = useState<'pending' | 'success' | 'error' | null>(null);
   const [showNFTPreview, setShowNFTPreview] = useState(false);
 
-  const handleSubmit = async (productData: {
-    twitterHandle: string;
-    productName: string;
-    productId: string;
-    description: string;
-    companyName: string;
-  }) => {
+  const handleSubmit = async (formData: any) => {
     try {
       setIsProcessing(true);
-      setShowNFTPreview(false);
-      setPreviewData(productData);
-
-      setCurrentStep('twitter');
-      setTransactionStatus('pending');
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      setCurrentStep('zkproof');
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      setCurrentStep('tokenization');
-      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      setTransactionStatus('success');
-      setShowNFTPreview(true);
-    } catch (error) {
-      console.error('Error processing product:', error);
-      setTransactionStatus('error');
-    } finally {
+      // Twitter data fetching
+      const response = await fetch(`http://localhost:5002/api/twitter/${formData.twitterHandle}`);
+      const responseData = await response.json();
+      
+      // Check for the nested data structure from backend
+      const twitterData = responseData.data; // Backend now returns { data: {...} }
+      
+      if (!twitterData) {
+        throw new Error('No data received from server');
+      }
+      
+      // Create description with Twitter data
+      const description = `Twitter Profile: ${twitterData.profile.name}\nBio: ${twitterData.profile.bio}\nFollowers: ${twitterData.profile.followers}\nRecent Tweets:\n${twitterData.tweets.join('\n')}`;
+      
+      // Set preview data with Twitter information
+      setPreviewData({
+        productName: formData.productName,
+        description: description,
+        companyName: formData.companyName
+      });
+
+      // Validate with backend
+      const validateResponse = await fetch('http://localhost:5002/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...formData, description }),
+      });
+
+      const validationData = await validateResponse.json();
+      if (!validationData.success) {
+        throw new Error(validationData.error || 'Validation failed');
+      }
+
+      // Show processing for 10 seconds
+      await new Promise(resolve => setTimeout(resolve, 10000));
+      
       setIsProcessing(false);
-      setCurrentStep('twitter');
+      setShowNFTPreview(true);
+      
+    } catch (error) {
+      console.error('Error:', error);
+      setIsProcessing(false);
+      // Could add error state handling here
+      alert(error instanceof Error ? error.message : 'An error occurred');
     }
   };
 
@@ -78,23 +95,17 @@ export default function HomePage() {
         <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
           <div className="space-y-8">
             {isProcessing ? (
-              <div className="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl p-12 text-center border border-white/10
-                            transform transition-all duration-500 hover:border-indigo-500/50">
-                {/* Processing state content */}
-                {/* ... Keep your existing processing state JSX ... */}
-              </div>
+              <ProcessingComponent />
+            ) : !showNFTPreview ? (
+              <ProductForm onSubmit={handleSubmit} />
             ) : (
-              !showNFTPreview && <ProductForm onSubmit={handleSubmit} />
+              <NFTPreview data={previewData} />
             )}
-          </div>
-
-          <div className="space-y-8">
-            <div className={`transition-all duration-500 transform ${showNFTPreview ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-              {showNFTPreview && <NFTPreview data={previewData} />}
-            </div>
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default HomePage;

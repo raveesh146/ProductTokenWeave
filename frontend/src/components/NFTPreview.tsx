@@ -1,5 +1,6 @@
 import React from 'react';
-import { Package2, Shield } from 'lucide-react';
+import { Package2, Shield, Twitter } from 'lucide-react';
+import type { TwitterData } from '../pages/TwitterService';
 
 interface NFTPreviewProps {
   data: {
@@ -7,9 +8,10 @@ interface NFTPreviewProps {
     description: string;
     companyName: string;
   } | null;
+  twitterData?: TwitterData | null;
 }
 
-const NFTPreview: React.FC<NFTPreviewProps> = ({ data }) => {
+const NFTPreview: React.FC<NFTPreviewProps> = ({ data, twitterData }) => {
   return (
     <div className="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-white/10
                     transform transition-all duration-500 hover:border-indigo-500/50 h-full">
@@ -41,6 +43,26 @@ const NFTPreview: React.FC<NFTPreviewProps> = ({ data }) => {
               <h4 className="text-sm font-medium text-indigo-300">Company</h4>
               <p className="text-white">{data.companyName}</p>
             </div>
+
+            {twitterData && (
+              <div className="bg-blue-500/5 rounded-xl p-4 border border-blue-500/10">
+                <div className="flex items-center space-x-3 mb-3">
+                  <Twitter className="w-5 h-5 text-blue-400" />
+                  <h4 className="text-sm font-medium text-blue-300">Twitter Profile</h4>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-white font-medium">{twitterData.profile.name}</p>
+                  <p className="text-white/80 text-sm">{twitterData.profile.bio}</p>
+                  <p className="text-blue-300 text-sm">{twitterData.profile.followers.toLocaleString()} followers</p>
+                  {twitterData.tweets.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-blue-500/10">
+                      <p className="text-sm text-blue-300 mb-2">Recent Tweet:</p>
+                      <p className="text-white/80 text-sm">{twitterData.tweets[0]}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             <div className="pt-4">
               <div className="text-sm text-indigo-300/80 flex items-center">

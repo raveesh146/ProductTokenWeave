@@ -31,7 +31,7 @@ export async function getTwitterData(handle: string): Promise<TwitterData> {
 
     // Get recent tweets
     const tweets = await twitterClient.v2.userTimeline(user.data.id, {
-      max_results: 10,
+      max_results: 5,
       exclude: ['retweets', 'replies']
     });
 
