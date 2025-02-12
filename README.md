@@ -14,13 +14,13 @@ Tokenize product details as Real World Asset (RWA) tokens.
 Secure transactions and data with ZK-SNARK Proofs.
 
 
-🔧 Tech Stack
+## 🔧 Tech Stack
 Arbitrum Stylus (Rust Contracts): Efficient and faster smart contract deployment.
 Twitter API: Automated product launch announcements and marketing integration.
 Circom + Snarkjs: ZK-SNARK Proof generation for secure and private verification.
 Pinata IPFS: Decentralized storage for product details and metadata, ensuring security and immutability.
 
-🌟 Key Features
+## 🌟 Key Features
 Seamless Tokenization and Twitter Marketing: Effortlessly convert product details into digital tokens while simultaneously promoting your launch on Twitter.
 Real-World Asset Tokenization: Securely tokenize your product details as RWA tokens, enabling digital ownership.
 Privacy-Preserving Transactions: Utilizes ZK-SNARK Proofs to ensure data security and user privacy.
