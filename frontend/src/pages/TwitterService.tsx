@@ -1,9 +1,5 @@
 import { TwitterApi } from 'twitter-api-v2';
 import { config } from '../config/env';
-import NodeCache from 'node-cache';
-
-// Initialize cache with 15 minute TTL
-const twitterCache = new NodeCache({ stdTTL: 900 });
 
 export interface TwitterData {
   profile: {
@@ -15,14 +11,6 @@ export interface TwitterData {
 }
 
 export async function getTwitterData(handle: string): Promise<TwitterData> {
-  const cacheKey = `twitter_${handle.toLowerCase()}`;
-
-  // Check cache first
-  const cachedData = twitterCache.get<TwitterData>(cacheKey);
-  if (cachedData) {
-    return cachedData;
-  }
-
   try {
     // Initialize client with bearer token
     if (!config.TWITTER_BEARER_TOKEN) {
@@ -47,7 +35,7 @@ export async function getTwitterData(handle: string): Promise<TwitterData> {
       exclude: ['retweets', 'replies']
     });
 
-    const twitterData = {
+    return {
       profile: {
         name: user.data.name,
         bio: user.data.description || '',
@@ -55,11 +43,6 @@ export async function getTwitterData(handle: string): Promise<TwitterData> {
       },
       tweets: tweets.data.data.map(tweet => tweet.text)
     };
-
-    // Store in cache
-    twitterCache.set(cacheKey, twitterData);
-
-    return twitterData;
   } catch (error: any) {
     console.error('Error fetching Twitter data:', error);
     throw new Error(`Failed to fetch Twitter data: ${error.message}`);
