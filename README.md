@@ -1,5 +1,4 @@
-# ProductTokenWeave
-
+# ProductTokenWeave - Track Winner at Arbitrum Stylus Mini Hack
 ProductTokenWeave is a decentralized platform that combines product launch announcements, RWA tokenization, and ZK-SNARK validation. Built on Arbitrum Stylus, it enables secure product launches with integrated Twitter marketing and on-chain verification.
 
 ![ProductTokenWeave Flow](Flow.png)
